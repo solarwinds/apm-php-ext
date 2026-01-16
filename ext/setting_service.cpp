@@ -15,7 +15,7 @@ namespace Solarwinds {
         return totalSize;
     }
 
-    SettingService::SettingService(const std::string& service_key, const std::string& collector, int refresh_interval_ms) : Service(refresh_interval_ms), headers_(nullptr) {
+    SettingService::SettingService(const std::string& service_key, const std::string& collector, int refresh_interval_s) : Service(refresh_interval_s), headers_(nullptr) {
         // hostname
         char hostname[256] = {0};
         gethostname(hostname, sizeof(hostname));
