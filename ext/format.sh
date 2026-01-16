@@ -1,2 +1,2 @@
 #!/bin/sh
-clang-format-18 -i *.c *.h
+find . -type f \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) -exec clang-format-18 -i {} +
