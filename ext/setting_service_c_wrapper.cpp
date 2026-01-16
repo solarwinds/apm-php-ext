@@ -15,20 +15,16 @@ void* Setting_Service_Allocate(char *collector, char *service_key) {
 void Setting_Service_Free(void* service) {
     if (service != nullptr) {
         auto s = static_cast<Solarwinds::SettingService *>(service);
-        if (s != nullptr) {
-            delete s;
-        }
+        delete s;
     }
 }
 
 bool Setting_Service_Get_Setting(void *service, char* ans) {
     if (service != nullptr) {
         auto s = static_cast<Solarwinds::SettingService *>(service);
-        if (s != nullptr) {
-            auto setting = s->getSetting();
-            strncpy(ans, setting.c_str(), setting.size());
-            return true;
-        }
+        auto setting = s->getSetting();
+        strncpy(ans, setting.c_str(), setting.size());
+        return true;
     }
     return false;
 }
