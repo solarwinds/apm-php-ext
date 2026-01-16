@@ -7,9 +7,7 @@ void* Setting_Service_Allocate(char *collector, char *service_key) {
         std::string collector_str = collector;
         std::string service_key_str = service_key;
         auto p = new Solarwinds::SettingService(service_key_str, collector_str);
-        if (p != nullptr) {
-            return static_cast<void *>(p);
-        }
+        return static_cast<void *>(p);
     }
     return nullptr;
 }
