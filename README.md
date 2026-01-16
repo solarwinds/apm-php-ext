@@ -1,7 +1,7 @@
 # apm-php-ext
 
 ## Overview
-apm-php-ext is a PHP extension for [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), to provide the sampling setting to the APM agent.
+solarwinds/apm-ext is a PHP extension for [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), to provide the sampling setting to the APM agent.
 
 ## Requirements
 - PHP 8+
