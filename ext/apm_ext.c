@@ -108,7 +108,7 @@ zend_module_entry apm_ext_module_entry = {
     PHP_MINIT(apm_ext),     /* PHP_MINIT - Module initialization */
     PHP_MSHUTDOWN(apm_ext), /* PHP_MSHUTDOWN - Module shutdown */
     PHP_RINIT(apm_ext),     /* PHP_RINIT - Request initialization */
-    NULL,               /* PHP_RSHUTDOWN - Request shutdown */
+    NULL,                   /* PHP_RSHUTDOWN - Request shutdown */
     PHP_MINFO(apm_ext),     /* PHP_MINFO - Module info */
     PHP_APM_EXT_VERSION,    /* Version */
     PHP_MODULE_GLOBALS(apm_ext),
