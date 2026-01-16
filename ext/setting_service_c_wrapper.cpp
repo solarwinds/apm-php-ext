@@ -24,8 +24,7 @@ bool Setting_Service_Get_Setting(void *service, char* ans) {
     if (service != nullptr) {
         auto s = static_cast<Solarwinds::SettingService *>(service);
         auto setting = s->getSetting();
-        strncpy(ans, setting.c_str(), setting.size());
-        ans[setting.size()] = '\0';
+        snprintf(ans, SETTING_BUFFER_SIZE, "%s", setting.c_str());
         return true;
     }
     return false;

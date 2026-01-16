@@ -34,7 +34,7 @@ PHP_INI_END()
 /* {{{ void Solarwinds\\Sampler\\setting() */
 PHP_FUNCTION(Solarwinds_Sampler_setting) {
   ZEND_PARSE_PARAMETERS_NONE();
-  char setting[1024] = {0};
+  char setting[SETTING_BUFFER_SIZE] = {0};
   Setting_Service_Get_Setting(APM_EXT_G(setting_service), setting);
   RETURN_STRING(setting);
 }

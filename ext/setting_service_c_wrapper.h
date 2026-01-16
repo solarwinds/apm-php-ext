@@ -1,6 +1,8 @@
 #ifndef EXT_SETTING_SERVICE_C_WRAPPER_H
 #define EXT_SETTING_SERVICE_C_WRAPPER_H
 
+#define SETTING_BUFFER_SIZE 1024
+
 #ifdef __cplusplus
 extern "C" {
 #endif
