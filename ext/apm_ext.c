@@ -104,7 +104,7 @@ PHP_GINIT_FUNCTION(apm_ext) { ZEND_SECURE_ZERO(apm_ext_globals, sizeof(*apm_ext_
 zend_module_entry apm_ext_module_entry = {
     STANDARD_MODULE_HEADER,
     "apm_ext",              /* Extension name */
-    ext_functions,      /* zend_function_entry */
+    ext_functions,          /* zend_function_entry */
     PHP_MINIT(apm_ext),     /* PHP_MINIT - Module initialization */
     PHP_MSHUTDOWN(apm_ext), /* PHP_MSHUTDOWN - Module shutdown */
     PHP_RINIT(apm_ext),     /* PHP_RINIT - Request initialization */
