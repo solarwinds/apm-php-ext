@@ -18,7 +18,10 @@ namespace Solarwinds {
     SettingService::SettingService(const std::string& service_key, const std::string& collector, int refresh_interval_s) : Service(refresh_interval_s), headers_(nullptr) {
         // hostname
         char hostname[256] = {0};
-        gethostname(hostname, sizeof(hostname));
+        if (gethostname(hostname, sizeof(hostname)) != 0) {
+            // On failure, ensure hostname is an empty string
+            hostname[0] = '\0';
+        }
         // service name
         auto pos = service_key.find_last_of(':');
         auto service_name = (pos != std::string::npos) ? service_key.substr(pos+1) : "unknown";
