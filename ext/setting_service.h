@@ -12,7 +12,7 @@ class SettingService : public Service {
 
 public:
   SettingService(const std::string &service_key, const std::string &collector,
-                 int refresh_interval_ms = DEFAULT_REFRESH_INTERVAL_S);
+                 int refresh_interval_s = DEFAULT_REFRESH_INTERVAL_S);
   virtual ~SettingService();
   virtual void task() override;
   std::string getSetting();
