@@ -35,7 +35,7 @@ RUN echo "$PHP_URL" \
   && tar -xf php.tar.xz \
   && rm php.tar.xz
 
-ARG PHP_CONFIG_OPTS="--enable-debug --with-pear --with-zlib --with-curl"
+ARG PHP_CONFIG_OPTS="--enable-debug"
 RUN cd php-${PHP_VERSION} \
   && ./buildconf \
   && ./configure ${PHP_CONFIG_OPTS} \
