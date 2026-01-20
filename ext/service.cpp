@@ -33,7 +33,7 @@ namespace Solarwinds {
                 }
             });
         } catch (const std::system_error& e) {
-            php_printf("Time: %lu System error: %s\n", (long)time(NULL), e.what());
+            fprintf(stderr, "Time: %lu System error: %s\n", (long)time(NULL), e.what());
         }
     }
     void Service::stop() {
@@ -45,7 +45,7 @@ namespace Solarwinds {
             cv_.notify_all();
             th_.join();
         } catch (const std::system_error& e) {
-            php_printf("Time: %lu System error: %s\n", (long)time(NULL), e.what());
+            fprintf(stderr, "Time: %lu System error: %s\n", (long)time(NULL), e.what());
         }
     }
 }

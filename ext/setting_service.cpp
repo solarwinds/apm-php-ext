@@ -62,20 +62,20 @@ namespace Solarwinds {
         curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response_body);
         auto res = curl_easy_perform(curl_);
         if (res != CURLE_OK) {
-            php_printf("Time: %lu curl_easy_perform() failed: %s\n", (long)time(NULL), curl_easy_strerror(res));
+            fprintf(stderr, "Time: %lu curl_easy_perform() failed: %s\n", (long)time(NULL), curl_easy_strerror(res));
             return;
         }
         long http_code = 0;
         curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &http_code);
         if (http_code != 200) {
-            php_printf("Time: %lu HTTP request failed with code: %ld\n", (long)time(NULL), http_code);
+            fprintf(stderr, "Time: %lu HTTP request failed with code: %ld\n", (long)time(NULL), http_code);
             return;
         }
         {
             std::unique_lock<std::mutex> lock(setting_mutex_);
             setting_ = response_body;
         }
-        // php_printf("Time: %lu Setting updated: %s\n", (long)time(NULL), setting_.c_str());
+        // fprintf(stderr, "Time: %lu Setting updated: %s\n", (long)time(NULL), setting_.c_str());
     }
 
     std::string SettingService::getSetting(){
