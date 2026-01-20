@@ -3,6 +3,7 @@
 #include <system_error>
 #include <time.h>
 #include "php.h"
+#include "logging.h"
 
 using namespace std::chrono_literals;
 
@@ -33,7 +34,7 @@ namespace Solarwinds {
                 }
             });
         } catch (const std::system_error& e) {
-            fprintf(stderr, "Time: %lu System error: %s\n", (long)time(NULL), e.what());
+            log_with_time("System error: %s", e.what());
         }
     }
     void Service::stop() {
@@ -45,7 +46,7 @@ namespace Solarwinds {
             cv_.notify_all();
             th_.join();
         } catch (const std::system_error& e) {
-            fprintf(stderr, "Time: %lu System error: %s\n", (long)time(NULL), e.what());
+            log_with_time("System error: %s", e.what());
         }
     }
 }

@@ -156,8 +156,7 @@ if test "$PHP_APM_EXT" != "no"; then
     ])
   PHP_CHECK_LIBRARY([curl],
     [curl_easy_perform],
-    [AC_DEFINE([HAVE_CURL], [1],
-      [Define to 1 if the PHP extension 'curl' is available.])],
+    [AC_DEFINE('HAVE_APM_EXT', 1, "Define to 1 if the PHP extension 'apm_ext' is available.")],
     [AC_MSG_FAILURE([The libcurl check failed.])],
     [$CURL_LIBS])
 
