@@ -26,6 +26,7 @@ namespace Solarwinds {
         }
         // service name
         auto pos = service_key.find_last_of(':');
+        auto token = (pos != std::string::npos) ? service_key.substr(0, pos) : service_key;
         auto service_name = (pos != std::string::npos) ? service_key.substr(pos+1) : "unknown";
         // curl init
         curl_ = curl_easy_init();
@@ -36,7 +37,7 @@ namespace Solarwinds {
         // ssl options
         curl_easy_setopt(curl_, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
         // Authorization header
-        auto auth = "Authorization: Bearer " + service_key;
+        auto auth = "Authorization: Bearer " + token;
         headers_ = curl_slist_append(headers_, auth.c_str());
         curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers_);
         // 10 seconds https timeout
