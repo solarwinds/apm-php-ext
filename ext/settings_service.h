@@ -1,5 +1,5 @@
-#ifndef EXT_SETTING_SERVICE_H
-#define EXT_SETTING_SERVICE_H
+#ifndef EXT_SETTINGS_SERVICE_H
+#define EXT_SETTINGS_SERVICE_H
 
 #include "service.h"
 #include <mutex>
@@ -7,22 +7,22 @@
 #include <curl/curl.h>
 
 namespace Solarwinds {
-class SettingService : public Service {
+class SettingsService : public Service {
   static constexpr int DEFAULT_REFRESH_INTERVAL_S = 60;
 
 public:
-  SettingService(const std::string &service_key, const std::string &collector,
+  SettingsService(const std::string &service_key, const std::string &collector,
                  int refresh_interval_s = DEFAULT_REFRESH_INTERVAL_S);
-  virtual ~SettingService();
+  virtual ~SettingsService();
   virtual void task() override;
-  std::string getSetting();
+  std::string getSettings();
 
 private:
-  std::mutex setting_mutex_;
-  std::string setting_;
+  std::mutex settings_mutex_;
+  std::string settings_;
   CURL *curl_;
   struct curl_slist *headers_;
 };
 } // namespace Solarwinds
 
-#endif // EXT_SETTING_SERVICE_H
+#endif // EXT_SETTINGS_SERVICE_H

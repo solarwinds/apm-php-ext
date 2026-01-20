@@ -88,7 +88,7 @@ if test "$PHP_APM_EXT" != "no"; then
   dnl PHP_SUBST(APM_EXT_SHARED_LIBADD)
 
   dnl In case of no dependencies
-  AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])
+  dnl AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])
 
   dnl Enable C++
   PHP_REQUIRE_CXX()
@@ -156,10 +156,10 @@ if test "$PHP_APM_EXT" != "no"; then
     ])
   PHP_CHECK_LIBRARY([curl],
     [curl_easy_perform],
-    [AC_DEFINE('HAVE_APM_EXT', 1, "Define to 1 if the PHP extension 'apm_ext' is available.")],
+    [AC_DEFINE(HAVE_APM_EXT, 1, "Define to 1 if the PHP extension 'apm_ext' is available.")],
     [AC_MSG_FAILURE([The libcurl check failed.])],
     [$CURL_LIBS])
 
-  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c setting_service_c_wrapper.cpp setting_service.cpp service.cpp], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter",cxx)
+  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c settings_service_c_wrapper.cpp settings_service.cpp service.cpp], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter",cxx)
   PHP_SUBST([APM_EXT_SHARED_LIBADD])
 fi

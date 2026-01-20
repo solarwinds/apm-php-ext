@@ -4,4 +4,4 @@
 
 namespace Solarwinds\Sampler;
 
-function setting(): string {}
+function settings(): string {}

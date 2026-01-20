@@ -9,7 +9,7 @@ extern zend_module_entry apm_ext_module_entry;
 ZEND_BEGIN_MODULE_GLOBALS(apm_ext)
 char *collector;
 char *service_key;
-void *setting_service;
+void *settings_service;
 ZEND_END_MODULE_GLOBALS(apm_ext)
 
 ZEND_EXTERN_MODULE_GLOBALS(apm_ext)

@@ -7,7 +7,7 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_apm_ext.h"
-#include "setting_service_c_wrapper.h"
+#include "settings_service_c_wrapper.h"
 #include "apm_ext_arginfo.h"
 #ifndef _WIN32
 #include <pthread.h>
@@ -31,22 +31,22 @@ STD_PHP_INI_ENTRY("apm_ext.service_key", "", PHP_INI_ALL, OnUpdateString,
                   service_key, zend_apm_ext_globals, apm_ext_globals)
 PHP_INI_END()
 
-/* {{{ void Solarwinds\\Sampler\\setting() */
-PHP_FUNCTION(Solarwinds_Sampler_setting) {
+/* {{{ void Solarwinds\\Sampler\\settings() */
+PHP_FUNCTION(Solarwinds_Sampler_settings) {
   ZEND_PARSE_PARAMETERS_NONE();
-  char setting[SETTING_BUFFER_SIZE] = {0};
-  Setting_Service_Get_Setting(APM_EXT_G(setting_service), setting);
-  RETURN_STRING(setting);
+  char settings[SETTINGS_BUFFER_SIZE] = {0};
+  Settings_Service_Get_Settings(APM_EXT_G(settings_service), settings);
+  RETURN_STRING(settings);
 }
 /* }}} */
 
 #ifndef _WIN32
 void prefork() {
-  Setting_Service_Free(APM_EXT_G(setting_service));
+  Settings_Service_Free(APM_EXT_G(settings_service));
 }
 
 void postfork() {
-  APM_EXT_G(setting_service) = Setting_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
+  APM_EXT_G(settings_service) = Settings_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
 }
 #endif
 
@@ -57,7 +57,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
 #endif
   REGISTER_INI_ENTRIES();
 
-  APM_EXT_G(setting_service) = Setting_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
+  APM_EXT_G(settings_service) = Settings_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
 
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);
@@ -69,7 +69,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION */
 PHP_MSHUTDOWN_FUNCTION(apm_ext) {
-  Setting_Service_Free(APM_EXT_G(setting_service));
+  Settings_Service_Free(APM_EXT_G(settings_service));
 
   UNREGISTER_INI_ENTRIES();
 

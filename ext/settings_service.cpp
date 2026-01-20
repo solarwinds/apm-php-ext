@@ -1,4 +1,4 @@
-#include "setting_service.h"
+#include "settings_service.h"
 #ifndef _WIN32
 #include <sys/types.h>
 #include <unistd.h>
@@ -18,7 +18,7 @@ namespace Solarwinds {
         return totalSize;
     }
 
-    SettingService::SettingService(const std::string& service_key, const std::string& collector, int refresh_interval_s) : Service(refresh_interval_s), headers_(nullptr) {
+    SettingsService::SettingsService(const std::string& service_key, const std::string& collector, int refresh_interval_s) : Service(refresh_interval_s), headers_(nullptr) {
         // hostname
         char hostname[256] = {0};
         if (gethostname(hostname, sizeof(hostname)) != 0) {
@@ -49,7 +49,7 @@ namespace Solarwinds {
         start();
     }
 
-    SettingService::~SettingService() {
+    SettingsService::~SettingsService() {
         // service stop
         stop();
         // free headers
@@ -58,7 +58,7 @@ namespace Solarwinds {
         curl_easy_cleanup(curl_);
     }
 
-    void SettingService::task() {
+    void SettingsService::task() {
         // write callback data
         std::string response_body;
         curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response_body);
@@ -74,14 +74,14 @@ namespace Solarwinds {
             return;
         }
         {
-            std::unique_lock<std::mutex> lock(setting_mutex_);
-            setting_ = response_body;
+            std::unique_lock<std::mutex> lock(settings_mutex_);
+            settings_ = response_body;
         }
-        // log_with_time("Setting updated: %s", setting_.c_str());
+        // log_with_time("Settings updated: %s", settings_.c_str());
     }
 
-    std::string SettingService::getSetting(){
-        std::unique_lock<std::mutex> lock(setting_mutex_);
-        return setting_;
+    std::string SettingsService::getSettings(){
+        std::unique_lock<std::mutex> lock(settings_mutex_);
+        return settings_;
     }
 }

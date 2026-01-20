@@ -46,6 +46,6 @@ tests/**/*.mem
 tmp-php.ini
 config.h.in~
 service.dep
-setting_service.dep
-setting_service_c_wrapper.dep
+settings_service.dep
+settings_service_c_wrapper.dep
 apm_ext.dep

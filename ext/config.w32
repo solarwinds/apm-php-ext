@@ -8,7 +8,7 @@ if (PHP_APM_EXT != 'no') {
     var curl_location;
     if ((curl_location = CHECK_LIB("libcurl_a.lib;libcurl.lib", "apm_ext", "C:\\Miniconda\\Library")) &&
         CHECK_HEADER_ADD_INCLUDE("curl/easy.h", "CFLAGS_APM_EXT", "C:\\Miniconda\\Library\\include")) {
-        EXTENSION('apm_ext', 'apm_ext.c setting_service_c_wrapper.cpp setting_service.cpp service.cpp', PHP_APM_EXT_SHARED, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 /EHsc');
+        EXTENSION('apm_ext', 'apm_ext.c settings_service_c_wrapper.cpp settings_service.cpp service.cpp', PHP_APM_EXT_SHARED, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 /EHsc');
         AC_DEFINE('HAVE_APM_EXT', 1, "Define to 1 if the PHP extension 'apm_ext' is available.");
         ADD_FLAG("CFLAGS_APM_EXT", "/D PHP_APM_EXT_EXPORTS=1");
         if (curl_location.match(/libcurl_a\.lib$/)) {
