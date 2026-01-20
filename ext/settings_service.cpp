@@ -10,6 +10,8 @@
 #include "logging.h"
 
 namespace Solarwinds {
+    constexpr static int MAX_HOSTNAME_LENGTH = 256;
+
     // Callback to write received data into a std::string
     size_t WriteCallback(char* contents, size_t size, size_t nmemb, void* userdata) {
         size_t totalSize = size * nmemb;
@@ -20,7 +22,7 @@ namespace Solarwinds {
 
     SettingsService::SettingsService(const std::string& service_key, const std::string& collector, int refresh_interval_s) : Service(refresh_interval_s), headers_(nullptr) {
         // hostname
-        char hostname[256] = {0};
+        char hostname[Solarwinds::MAX_HOSTNAME_LENGTH] = {0};
         if (gethostname(hostname, sizeof(hostname)) != 0) {
             // On failure, ensure hostname is an empty string
             hostname[0] = '\0';
