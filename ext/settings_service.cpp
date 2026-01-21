@@ -25,7 +25,6 @@ namespace Solarwinds {
         char hostname[Solarwinds::MAX_HOSTNAME_LENGTH] = {0};
         if (gethostname(hostname, sizeof(hostname)) != 0) {
             // On failure, ensure hostname is an empty string
-            hostname[0] = '\0';
         }
         // service name
         auto pos = service_key.find_last_of(':');
