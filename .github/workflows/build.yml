@@ -40,8 +40,6 @@ jobs:
           ./configure
           make
       - name: Test
-        env:
-          TEST_PHP_ARGS: "-q" #do not try to submit failures
         run: make test TESTS=--show-diff
 
   windows:
