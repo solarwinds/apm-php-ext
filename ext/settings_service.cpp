@@ -79,7 +79,6 @@ namespace Solarwinds {
             std::unique_lock<std::mutex> lock(settings_mutex_);
             settings_ = response_body;
         }
-        // log_with_time("Settings updated: %s", settings_.c_str());
     }
 
     std::string SettingsService::getSettings(){
