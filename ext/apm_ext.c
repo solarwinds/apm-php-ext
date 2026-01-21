@@ -97,7 +97,10 @@ PHP_MINFO_FUNCTION(apm_ext) {
 /* }}} */
 
 /* {{{ PHP_GINIT_FUNCTION */
-PHP_GINIT_FUNCTION(apm_ext) { ZEND_SECURE_ZERO(apm_ext_globals, sizeof(*apm_ext_globals)); }
+PHP_GINIT_FUNCTION(apm_ext)
+{
+  ZEND_SECURE_ZERO(apm_ext_globals, sizeof(*apm_ext_globals));
+}
 /* }}} */
 
 /* {{{ apm_ext_module_entry */
