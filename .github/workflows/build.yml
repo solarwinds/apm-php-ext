@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
         php: [ '8.1', '8.2', '8.3', '8.4' ]
+        ts: [ 'ts', 'nts' ]
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -28,6 +29,8 @@ jobs:
         uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # v2
         with:
           php-version: ${{ matrix.php }}
+        env:
+          phpts: ${{ matrix.ts }}
       - name: Install libcurl
         if: runner.os == 'Linux'
         run: |
@@ -40,6 +43,8 @@ jobs:
           ./configure
           make
       - name: Test
+        env:
+          TEST_PHP_ARGS: "-q" #do not try to submit failures
         run: make test TESTS=--show-diff
 
   windows:
