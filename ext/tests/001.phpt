@@ -1,10 +1,10 @@
 --TEST--
-Check if apm_ext is loaded
---EXTENSIONS--
-apm_ext-test
+Check for apm_ext-test presence
+--SKIPIF--
+<?php if (!extension_loaded("apm_ext_test")) print "skip - apm_ext_test extension not available"; ?>
 --FILE--
 <?php
-echo 'The extension "apm_ext-test" is available';
+echo "apm_ext extension is available";
 ?>
 --EXPECT--
-The extension "apm_ext-test" is available
+apm_ext extension is available
