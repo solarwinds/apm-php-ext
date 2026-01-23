@@ -1,5 +1,5 @@
 {
-  "name": "solarwinds/apm-ext",
+  "name": "solarwinds/apm_ext",
   "description": "C extension for solarwinds/apm",
   "type": "php-ext",
   "minimum-stability": "stable",
