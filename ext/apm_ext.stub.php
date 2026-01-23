@@ -4,4 +4,4 @@
 
 namespace Solarwinds\Sampler;
 
-function settings(): string {}
+function settings(string $collector, string $serviceKey): string {}
