@@ -1,0 +1,20 @@
+{
+  "name": "solarwinds/apm_ext",
+  "description": "C extension for solarwinds/apm",
+  "type": "php-ext",
+  "minimum-stability": "stable",
+  "license": "Apache-2.0",
+  "php-ext": {
+    "extension-name": "apm_ext",
+    "build-path": "ext"
+  },
+  "require": {
+    "php": "^8.0"
+  },
+  "authors": [
+    {
+      "name": "Jerry Leung",
+      "email": "tingfung.leung@solarwinds.com"
+    }
+  ]
+}

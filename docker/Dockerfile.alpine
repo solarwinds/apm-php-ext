@@ -1,0 +1,38 @@
+ARG ALPINE_VERSION=alpine:3.20@sha256:765942a4039992336de8dd5db680586e1a206607dd06170ff0a37267a9e01958
+FROM ${ALPINE_VERSION} AS builder
+WORKDIR /usr/src
+
+ENV PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c curl-dev openssl"
+
+RUN apk add --no-cache \
+    ${PHPIZE_DEPS} \
+    bash \
+    ca-certificates \
+    curl \
+    tar \
+    xz
+
+RUN apk add --no-cache \
+    bison \
+    coreutils \
+    curl-dev \
+    libxml2-dev \
+    linux-headers \
+    re2c \
+    readline-dev \
+    sqlite-dev
+
+ARG PHP_VERSION
+ENV PHP_URL="https://github.com/php/php-src/archive/refs/tags/php-${PHP_VERSION}.tar.gz"
+
+ARG PHP_CONFIG_OPTS="--enable-debug"
+RUN echo "$PHP_URL" && curl -fsSL -o php.tar.gz "$PHP_URL" \
+  && cd /usr/src \
+  && mkdir php-src \
+  && tar -xzf php.tar.gz -C php-src --strip-components=1 \
+  && cd php-src \
+  && ./buildconf --force \
+  && ./configure ${PHP_CONFIG_OPTS} \
+  && make -j $(nproc) \
+  && make install
+WORKDIR /usr/src/myapp
