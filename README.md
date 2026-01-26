@@ -6,6 +6,7 @@ solarwinds/apm_ext is a PHP extension for [solarwinds/apm](https://packagist.org
 ## Requirements
 - PHP 8+
 - [libcurl](https://curl.se/libcurl/)
+- [pie](https://github.com/php/pie)
 
 ## Installation
 
@@ -13,7 +14,9 @@ The extension can be installed in the following way:
 
 ### php-extension-installer
 
-TBD
+```shell
+pie install solarwinds/apm_ext
+```
 
 ## Verify that the extension is installed and enabled
 
