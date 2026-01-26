@@ -24,17 +24,29 @@
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
 PHP_INI_BEGIN()
-STD_PHP_INI_ENTRY("apm_ext.collector", "apm.collector.na-01.cloud.solarwinds.com",
-                  PHP_INI_ALL, OnUpdateString, collector, zend_apm_ext_globals,
-                  apm_ext_globals)
-STD_PHP_INI_ENTRY("apm_ext.service_key", "", PHP_INI_ALL, OnUpdateString,
-                  service_key, zend_apm_ext_globals, apm_ext_globals)
 PHP_INI_END()
 
 /* {{{ void Solarwinds\\Sampler\\settings() */
 PHP_FUNCTION(Solarwinds_Sampler_settings) {
-  ZEND_PARSE_PARAMETERS_NONE();
+  char *collector;
+  size_t collctor_len;
+  char *service_key;
+  size_t service_key_len;
+  ZEND_PARSE_PARAMETERS_START(2, 2)
+    Z_PARAM_STRING(collector, collctor_len)
+    Z_PARAM_STRING(service_key, service_key_len)
+  ZEND_PARSE_PARAMETERS_END();
+
   char settings[SETTINGS_BUFFER_SIZE] = {0};
+
+  if (!collctor_len || !service_key_len) {
+    RETURN_STRING(settings);
+  }
+
+  if (APM_EXT_G(settings_service) == NULL) {
+    APM_EXT_G(settings_service) = Settings_Service_Allocate(collector, service_key);
+  }
+
   Settings_Service_Get_Settings(APM_EXT_G(settings_service), settings);
   RETURN_STRING(settings);
 }
@@ -43,10 +55,10 @@ PHP_FUNCTION(Solarwinds_Sampler_settings) {
 #ifndef _WIN32
 void prefork() {
   Settings_Service_Free(APM_EXT_G(settings_service));
+  APM_EXT_G(settings_service) = NULL;
 }
 
 void postfork() {
-  APM_EXT_G(settings_service) = Settings_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
 }
 #endif
 
@@ -56,8 +68,6 @@ PHP_MINIT_FUNCTION(apm_ext) {
   ZEND_TSRMLS_CACHE_UPDATE();
 #endif
   REGISTER_INI_ENTRIES();
-
-  APM_EXT_G(settings_service) = Settings_Service_Allocate(APM_EXT_G(collector), APM_EXT_G(service_key));
 
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);
@@ -70,6 +80,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
 /* {{{ PHP_MSHUTDOWN_FUNCTION */
 PHP_MSHUTDOWN_FUNCTION(apm_ext) {
   Settings_Service_Free(APM_EXT_G(settings_service));
+  APM_EXT_G(settings_service) = NULL;
 
   UNREGISTER_INI_ENTRIES();
 

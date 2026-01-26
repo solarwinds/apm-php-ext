@@ -21,13 +21,6 @@ TBD
 php --ri  apm_ext
 ```
 
-## Configuration
-
-This feature can be configured via `.ini` by modifying the following entries:
-
-- `apm_ext.collector` - Solarwinds [APM collector](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm#General). Default `apm.collector.na-01.cloud.solarwinds.com`
-- `apm_ext.service_key` - Service Key
-
 ## Contributing
 
 Contributions are welcome!
