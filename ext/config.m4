@@ -11,5 +11,5 @@ if test "$PHP_APM_EXT" != "no"; then
   PHP_REQUIRE_CXX()
 
   AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])
-  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c cache_c_wrapper.cpp cache.cpp], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter",cxx)
+  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c cache_c_wrapper.cpp cache.cpp], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter -std=c++17",cxx)
 fi
