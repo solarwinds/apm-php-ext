@@ -7,7 +7,7 @@ extern zend_module_entry apm_ext_module_entry;
 #define phpext_apm_ext_ptr &apm_ext_module_entry
 
 ZEND_BEGIN_MODULE_GLOBALS(apm_ext)
-void *settings_service;
+void *cache;
 ZEND_END_MODULE_GLOBALS(apm_ext)
 
 ZEND_EXTERN_MODULE_GLOBALS(apm_ext)

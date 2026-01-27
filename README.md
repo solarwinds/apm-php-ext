@@ -1,11 +1,10 @@
 # apm-php-ext
 
 ## Overview
-solarwinds/apm_ext is a PHP extension for [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), to provide the sampling setting to the APM library.
+solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), to cache the sampling setting for the APM library.
 
 ## Requirements
 - PHP 8+
-- [libcurl](https://curl.se/libcurl/)
 - [pie](https://github.com/php/pie)
 
 ## Installation

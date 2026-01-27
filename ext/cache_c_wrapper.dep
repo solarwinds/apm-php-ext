@@ -1,0 +1,2 @@
+cache_c_wrapper.lo: /usr/src/myapp/cache_c_wrapper.cpp \
+ /usr/src/myapp/cache_c_wrapper.h /usr/src/myapp/cache.h
