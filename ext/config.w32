@@ -2,5 +2,5 @@ ARG_ENABLE('apm_ext', 'apm_ext support', 'no');
 
 if (PHP_APM_EXT != 'no') {
     AC_DEFINE('HAVE_APM_EXT', 1, 'apm_ext support enabled');
-    EXTENSION('apm_ext', 'apm_ext.c cache_c_wrapper.cpp cache.cpp', PHP_APM_EXT_SHARED, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+    EXTENSION('apm_ext', 'apm_ext.c cache_c_wrapper.cpp cache.cpp', PHP_APM_EXT_SHARED, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 /std:c++17');
 }
