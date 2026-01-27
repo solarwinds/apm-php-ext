@@ -24,8 +24,8 @@ bool Cache_Get(void* cache, char* collector, char* token, char* serviceName, cha
     if (cache != nullptr && collector != nullptr && token != nullptr && serviceName != nullptr) {
         auto c = static_cast<Solarwinds::Cache *>(cache);
         auto result = c->Get(std::string(collector), std::string(token), std::string(serviceName));
-        if (result.has_value()) {
-            snprintf(ans, SETTINGS_BUFFER_SIZE, "%s", result->c_str());
+        if (result.first) {
+            snprintf(ans, SETTINGS_BUFFER_SIZE, "%s", result.second.c_str());
             return true;
         }
     }

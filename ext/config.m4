@@ -8,7 +8,6 @@ PHP_ARG_ENABLE([apm_ext],
 
 if test "$PHP_APM_EXT" != "no"; then
   dnl Enable C++
-  CXX_FLAGS="-std=c++17"
   PHP_REQUIRE_CXX()
 
   AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])

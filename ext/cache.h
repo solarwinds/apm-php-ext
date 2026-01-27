@@ -28,9 +28,10 @@ namespace Solarwinds {
          * @param collector The collector endpoint.
          * @param token The token.
          * @param serviceName The name of the service.
-         * @return An optional string containing the settings if found, or std::nullopt if not found.
+         * @return A pair where the first element indicates if the settings were found,
+         *         and the second element is the cached settings (if found).
          */
-        std::optional<std::string> Get(const std::string& collector, const std::string& token, const std::string& serviceName);
+        std::pair<bool, std::string> Get(const std::string& collector, const std::string& token, const std::string& serviceName);
     private:
         /**
          * The in-memory cache storing settings.
