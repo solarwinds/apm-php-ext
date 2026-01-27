@@ -1,7 +1,5 @@
 dnl config.m4 for extension apm_ext
 
-CXXFLAGS += -std=c++17
-
 PHP_ARG_ENABLE([apm_ext],
   [whether to enable apm_ext support],
   [AS_HELP_STRING([--enable-apm_ext],
@@ -10,6 +8,7 @@ PHP_ARG_ENABLE([apm_ext],
 
 if test "$PHP_APM_EXT" != "no"; then
   dnl Enable C++
+  CXX_FLAGS="-std=c++17"
   PHP_REQUIRE_CXX()
 
   AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])
