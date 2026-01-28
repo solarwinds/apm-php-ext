@@ -35,9 +35,9 @@ PHP_FUNCTION(Solarwinds_Cache_get) {
   char *service_name;
   size_t service_name_len;
   ZEND_PARSE_PARAMETERS_START(3, 3)
-    Z_PARAM_STRING(collector, collctor_len)
-    Z_PARAM_STRING(token, token_len)
-    Z_PARAM_STRING(service_name, service_name_len)
+  Z_PARAM_STRING(collector, collctor_len)
+  Z_PARAM_STRING(token, token_len)
+  Z_PARAM_STRING(service_name, service_name_len)
   ZEND_PARSE_PARAMETERS_END();
 
   if (!collctor_len || !token_len || !service_name_len) {
@@ -64,10 +64,10 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
   char *settings;
   size_t settings_len;
   ZEND_PARSE_PARAMETERS_START(4, 4)
-    Z_PARAM_STRING(collector, collctor_len)
-    Z_PARAM_STRING(token, token_len)
-    Z_PARAM_STRING(service_name, service_name_len)
-    Z_PARAM_STRING(settings, settings_len)
+  Z_PARAM_STRING(collector, collctor_len)
+  Z_PARAM_STRING(token, token_len)
+  Z_PARAM_STRING(service_name, service_name_len)
+  Z_PARAM_STRING(settings, settings_len)
   ZEND_PARSE_PARAMETERS_END();
 
   if (collctor_len && token_len && service_name_len && settings_len) {
@@ -85,9 +85,7 @@ void prefork() {
   APM_EXT_G(cache) = NULL;
 }
 
-void postfork() {
-  APM_EXT_G(cache) = Cache_Allocate();
-}
+void postfork() { APM_EXT_G(cache) = Cache_Allocate(); }
 #endif
 
 /* {{{ PHP_MINIT_FUNCTION */
@@ -138,8 +136,7 @@ PHP_MINFO_FUNCTION(apm_ext) {
 /* }}} */
 
 /* {{{ PHP_GINIT_FUNCTION */
-PHP_GINIT_FUNCTION(apm_ext)
-{
+PHP_GINIT_FUNCTION(apm_ext) {
   ZEND_SECURE_ZERO(apm_ext_globals, sizeof(*apm_ext_globals));
 }
 /* }}} */
