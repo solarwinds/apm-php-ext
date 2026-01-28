@@ -26,7 +26,7 @@ ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 PHP_INI_BEGIN()
 PHP_INI_END()
 
-/* {{{ void Solarwinds\\Sampler\\get() */
+/* {{{ void Solarwinds\\Cache\\get() */
 PHP_FUNCTION(Solarwinds_Sampler_get) {
   char *collector;
   size_t collctor_len;
@@ -53,7 +53,7 @@ PHP_FUNCTION(Solarwinds_Sampler_get) {
 }
 /* }}} */
 
-/* {{{ void Solarwinds\\Sampler\\put() */
+/* {{{ void Solarwinds\\Cache\\put() */
 PHP_FUNCTION(Solarwinds_Sampler_put) {
   char *collector;
   size_t collctor_len;

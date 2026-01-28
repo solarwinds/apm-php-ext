@@ -20,7 +20,7 @@ ZEND_FUNCTION(Solarwinds_Sampler_put);
 
 
 static const zend_function_entry ext_functions[] = {
-	ZEND_NS_FALIAS("Solarwinds\\Sampler", get, Solarwinds_Sampler_get, arginfo_Solarwinds_Sampler_get)
-	ZEND_NS_FALIAS("Solarwinds\\Sampler", put, Solarwinds_Sampler_put, arginfo_Solarwinds_Sampler_put)
+	ZEND_NS_FALIAS("Solarwinds\\Cache", get, Solarwinds_Sampler_get, arginfo_Solarwinds_Sampler_get)
+	ZEND_NS_FALIAS("Solarwinds\\Cache", put, Solarwinds_Sampler_put, arginfo_Solarwinds_Sampler_put)
 	ZEND_FE_END
 };

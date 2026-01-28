@@ -2,7 +2,7 @@
 
 /** @generate-function-entries */
 
-namespace Solarwinds\Sampler;
+namespace Solarwinds\Cache;
 
 function get(string $collector, string $token, string $serviceName): string|false {}
 
