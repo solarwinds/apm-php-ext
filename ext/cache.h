@@ -40,10 +40,10 @@ public:
 private:
   /**
    * The in-memory cache storing settings.
-   * The key is a tuple of (collector, token, serviceName).
+   * The key is a tuple of (collector, std::hash<std::string>{}(token), serviceName).
    * The value is the cached settings string.
    */
-  std::map<std::tuple<std::string, std::string, std::string>, std::string>
+  std::map<std::tuple<std::string, std::size_t, std::string>, std::string>
       cache_;
   /**
    * Mutex to ensure thread-safe access to the cache.
