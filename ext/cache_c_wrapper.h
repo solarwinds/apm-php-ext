@@ -1,7 +1,7 @@
 #ifndef APM_PHP_EXT_CACHE_C_WRAPPER_H
 #define APM_PHP_EXT_CACHE_C_WRAPPER_H
 
-#define SETTINGS_BUFFER_SIZE 1024
+#define SETTINGS_BUFFER_SIZE 2048
 
 #ifdef __cplusplus
 extern "C" {
