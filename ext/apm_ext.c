@@ -27,7 +27,7 @@ PHP_INI_BEGIN()
 PHP_INI_END()
 
 /* {{{ void Solarwinds\\Cache\\get() */
-PHP_FUNCTION(Solarwinds_Sampler_get) {
+PHP_FUNCTION(Solarwinds_Cache_get) {
   char *collector;
   size_t collctor_len;
   char *token;
@@ -54,7 +54,7 @@ PHP_FUNCTION(Solarwinds_Sampler_get) {
 /* }}} */
 
 /* {{{ void Solarwinds\\Cache\\put() */
-PHP_FUNCTION(Solarwinds_Sampler_put) {
+PHP_FUNCTION(Solarwinds_Cache_put) {
   char *collector;
   size_t collctor_len;
   char *token;
