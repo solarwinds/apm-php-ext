@@ -30,7 +30,7 @@ for ($i = 0; $i < 2; $i++) {
     for ($j = 0; $j < 2; $j++) {
         for ($k = 0; $k < 2; $k++) {
             // Retrieve non-existing value
-            var_dump(\Solarwinds\Cache\put("c".$i, "t".$j, "n".$k, "new"));
+            var_dump(\Solarwinds\Cache\put("c".$i, "t".$j, "n".$k, "new".$i.$j.$k));
         }
     }
 }
@@ -71,11 +71,11 @@ bool(true)
 bool(true)
 bool(true)
 bool(true)
-string(3) "new"
-string(3) "new"
-string(3) "new"
-string(3) "new"
-string(3) "new"
-string(3) "new"
-string(3) "new"
-string(3) "new"
+string(6) "new000"
+string(6) "new001"
+string(6) "new010"
+string(6) "new011"
+string(6) "new100"
+string(6) "new101"
+string(6) "new110"
+string(6) "new111"
