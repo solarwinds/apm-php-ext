@@ -29,18 +29,18 @@ PHP_INI_END()
 /* {{{ void Solarwinds\\Cache\\get() */
 PHP_FUNCTION(Solarwinds_Cache_get) {
   char *collector;
-  size_t collctor_len;
+  size_t collector_len;
   char *token;
   size_t token_len;
   char *service_name;
   size_t service_name_len;
   ZEND_PARSE_PARAMETERS_START(3, 3)
-  Z_PARAM_STRING(collector, collctor_len)
+  Z_PARAM_STRING(collector, collector_len)
   Z_PARAM_STRING(token, token_len)
   Z_PARAM_STRING(service_name, service_name_len)
   ZEND_PARSE_PARAMETERS_END();
 
-  if (!collctor_len || !token_len || !service_name_len) {
+  if (!collector_len || !token_len || !service_name_len) {
     RETURN_FALSE;
   }
 
@@ -56,7 +56,7 @@ PHP_FUNCTION(Solarwinds_Cache_get) {
 /* {{{ void Solarwinds\\Cache\\put() */
 PHP_FUNCTION(Solarwinds_Cache_put) {
   char *collector;
-  size_t collctor_len;
+  size_t collector_len;
   char *token;
   size_t token_len;
   char *service_name;
@@ -64,13 +64,13 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
   char *settings;
   size_t settings_len;
   ZEND_PARSE_PARAMETERS_START(4, 4)
-  Z_PARAM_STRING(collector, collctor_len)
+  Z_PARAM_STRING(collector, collector_len)
   Z_PARAM_STRING(token, token_len)
   Z_PARAM_STRING(service_name, service_name_len)
   Z_PARAM_STRING(settings, settings_len)
   ZEND_PARSE_PARAMETERS_END();
 
-  if (collctor_len && token_len && service_name_len && settings_len) {
+  if (collector_len && token_len && service_name_len && settings_len) {
     Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
     RETURN_TRUE;
   }
