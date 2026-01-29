@@ -1,9 +1,11 @@
 #ifndef APM_PHP_EXT_CACHE_H
 #define APM_PHP_EXT_CACHE_H
 
+#include <list>
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 /**
  * Simple in-memory cache for storing settings based on collector, token, and
@@ -13,6 +15,7 @@ namespace Solarwinds {
 
 class Cache {
 public:
+  Cache(size_t capacity);
   /**
    * Store settings in the cache.
    *
@@ -37,10 +40,15 @@ public:
                                    const std::string &serviceName);
 
 private:
+  size_t capacity_;
+
+  std::list<std::pair<std::string, std::string>> cache_;
   /**
    * The underlying cache storage.
    */
-  std::unordered_map<std::string, std::string> cache_;
+  std::unordered_map<std::string,
+                     std::list<std::pair<std::string, std::string>>::iterator>
+      cache_map_;
   /**
    * Mutex to ensure thread-safe access to the cache.
    */

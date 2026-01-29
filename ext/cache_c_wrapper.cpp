@@ -3,7 +3,7 @@
 #include <new>
 
 void *Cache_Allocate(long cache_max_size) {
-  return new (std::nothrow) Solarwinds::Cache();
+  return new (std::nothrow) Solarwinds::Cache(cache_max_size);
 }
 
 void Cache_Free(void *cache) {
