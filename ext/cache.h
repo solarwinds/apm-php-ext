@@ -37,6 +37,9 @@ public:
                                    const std::string &serviceName);
 
 private:
+  /**
+   * The underlying cache storage.
+   */
   std::unordered_map<std::string, std::string> cache_;
   /**
    * Mutex to ensure thread-safe access to the cache.
