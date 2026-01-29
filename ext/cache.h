@@ -3,40 +3,13 @@
 
 #include <mutex>
 #include <string>
-#include <tuple>
-#include <map>
+#include <unordered_map>
 
 /**
  * Simple in-memory cache for storing settings based on collector, token, and
  * service name.
  */
 namespace Solarwinds {
-
-/**
- * Hash function for tuples to be used in unordered_map.
- */
-  /*
-struct TupleHash {
-  template <class T> struct component {
-    const T &value;
-    component(const T &value) : value(value) {}
-    size_t operator,(size_t n) const {
-      // Combine hash of current component with the accumulated hash, 0x9e3779b9
-      // is the integral part of the Golden Ratio's fractional part
-      // 0.61803398875…
-      n ^= std::hash<T>{}(value) + 0x9e3779b9 + (n << 6) +
-           (n >> 2); // Hash combine formula
-      return n;
-    }
-  };
-
-  template <class Tuple> size_t operator()(const Tuple &tuple) const {
-    size_t seed = 0;
-    std::apply([&](const auto &...xs) { (component(xs), ..., seed); }, tuple);
-    return seed;
-  }
-};
-*/
 
 class Cache {
 public:
@@ -64,14 +37,7 @@ public:
                                    const std::string &serviceName);
 
 private:
-  /**
-   * The in-memory cache storing settings.
-   * The key is a tuple of (collector, std::hash<std::string>{}(token),
-   * serviceName). The value is the cached settings string.
-   */
-  std::map<std::tuple<std::string, std::size_t, std::string>,
-                     std::string>
-      cache_;
+  std::unordered_map<std::string, std::string> cache_;
   /**
    * Mutex to ensure thread-safe access to the cache.
    */
