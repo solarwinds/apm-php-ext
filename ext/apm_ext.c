@@ -82,7 +82,7 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
       Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
       RETURN_TRUE;
     }
-    fprintf(stderr, "apm_ext: settings length %zu exceeds max length %ld\n",
+    fprintf(stderr, "apm_ext: settings length %zu exceeds max length %lld\n",
             settings_len, APM_EXT_G(settings_max_length));
   }
   RETURN_FALSE;
