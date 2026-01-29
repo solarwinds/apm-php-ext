@@ -4,7 +4,7 @@
 #include <mutex>
 #include <string>
 #include <tuple>
-#include <unordered_map>
+#include <map>
 
 /**
  * Simple in-memory cache for storing settings based on collector, token, and
@@ -15,6 +15,7 @@ namespace Solarwinds {
 /**
  * Hash function for tuples to be used in unordered_map.
  */
+  /*
 struct TupleHash {
   template <class T> struct component {
     const T &value;
@@ -35,6 +36,7 @@ struct TupleHash {
     return seed;
   }
 };
+*/
 
 class Cache {
 public:
@@ -67,8 +69,8 @@ private:
    * The key is a tuple of (collector, std::hash<std::string>{}(token),
    * serviceName). The value is the cached settings string.
    */
-  std::unordered_map<std::tuple<std::string, std::size_t, std::string>,
-                     std::string, TupleHash>
+  std::map<std::tuple<std::string, std::size_t, std::string>,
+                     std::string>
       cache_;
   /**
    * Mutex to ensure thread-safe access to the cache.
