@@ -27,7 +27,7 @@ PHP_INI_BEGIN()
 STD_PHP_INI_ENTRY("apm_ext.cache_max_size", "10000", PHP_INI_ALL,
                   OnUpdateLongGEZero, cache_max_size, zend_apm_ext_globals,
                   apm_ext_globals)
-STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "2048", PHP_INI_ALL,
+STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "4096", PHP_INI_ALL,
                   OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
                   apm_ext_globals)
 PHP_INI_END()
