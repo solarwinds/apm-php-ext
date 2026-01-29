@@ -1,7 +1,7 @@
 #include "cache.h"
 
 namespace Solarwinds {
-Cache::Cache(size_t capacity) : capacity_(capacity) {}
+Cache::Cache(size_t max_entries) : max_entries_(max_entries) {}
 
 void Cache::Put(const std::string &collector, const std::string &token,
                 const std::string &serviceName, const std::string &settings) {
@@ -10,7 +10,7 @@ void Cache::Put(const std::string &collector, const std::string &token,
   std::lock_guard<std::mutex> lock(cache_mutex_);
   if (cache_map_.find(key) == cache_map_.end()) {
     // new
-    while (cache_.size() > capacity_ - 1) {
+    while (cache_.size() > max_entries_ - 1) {
       auto it = cache_.front();
       cache_map_.erase(it.first);
       cache_.pop_front();

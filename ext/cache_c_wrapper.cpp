@@ -2,8 +2,8 @@
 #include "cache.h"
 #include <new>
 
-void *Cache_Allocate(long cache_max_size) {
-  return new (std::nothrow) Solarwinds::Cache(cache_max_size);
+void *Cache_Allocate(long cache_max_entries) {
+  return new (std::nothrow) Solarwinds::Cache(cache_max_entries);
 }
 
 void Cache_Free(void *cache) {

@@ -24,8 +24,8 @@
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
 PHP_INI_BEGIN()
-STD_PHP_INI_ENTRY("apm_ext.cache_max_size", "10000", PHP_INI_ALL,
-                  OnUpdateLongGEZero, cache_max_size, zend_apm_ext_globals,
+STD_PHP_INI_ENTRY("apm_ext.cache_max_entries", "20", PHP_INI_ALL,
+                  OnUpdateLongGEZero, cache_max_entries, zend_apm_ext_globals,
                   apm_ext_globals)
 STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "4096", PHP_INI_ALL,
                   OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
@@ -96,7 +96,7 @@ void prefork() {
 }
 
 void postfork() {
-  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_size));
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
 }
 #endif
 
@@ -107,7 +107,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
 #endif
   REGISTER_INI_ENTRIES();
 
-  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_size));
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
 
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);

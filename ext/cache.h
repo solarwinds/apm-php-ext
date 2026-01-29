@@ -15,7 +15,7 @@ namespace Solarwinds {
 
 class Cache {
 public:
-  Cache(size_t capacity);
+  Cache(size_t max_entries);
   /**
    * Store settings in the cache.
    *
@@ -40,7 +40,7 @@ public:
                                    const std::string &serviceName);
 
 private:
-  size_t capacity_;
+  size_t max_entries_;
 
   std::list<std::pair<std::string, std::string>> cache_;
   /**

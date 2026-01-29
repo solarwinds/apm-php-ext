@@ -11,7 +11,7 @@ extern "C" {
  * Allocate a Solarwinds::Cache object
  * @return void*
  */
-void *Cache_Allocate(long cache_max_size);
+void *Cache_Allocate(long cache_max_entries);
 
 /**
  * Free a Solarwinds::Cache object

@@ -8,7 +8,7 @@ extern zend_module_entry apm_ext_module_entry;
 
 ZEND_BEGIN_MODULE_GLOBALS(apm_ext)
 void *cache;
-zend_long cache_max_size;
+zend_long cache_max_entries;
 zend_long settings_max_length;
 ZEND_END_MODULE_GLOBALS(apm_ext)
 
