@@ -1,17 +1,17 @@
 #ifndef APM_PHP_EXT_CACHE_C_WRAPPER_H
 #define APM_PHP_EXT_CACHE_C_WRAPPER_H
 
-#define SETTINGS_BUFFER_SIZE 2048
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <Zend/zend.h>
 
 /**
  * Allocate a Solarwinds::Cache object
  * @return void*
  */
-void *Cache_Allocate();
+void *Cache_Allocate(long cache_max_size);
 
 /**
  * Free a Solarwinds::Cache object
@@ -23,8 +23,8 @@ void Cache_Free(void *cache);
 void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
                char *settings);
 
-bool Cache_Get(void *cache, char *collector, char *token, char *serviceName,
-               char *ans);
+zend_string *Cache_Get(void *cache, char *collector, char *token,
+                       char *serviceName);
 
 #ifdef __cplusplus
 }

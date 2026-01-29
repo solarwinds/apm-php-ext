@@ -2,7 +2,9 @@
 #include "cache.h"
 #include <new>
 
-void *Cache_Allocate() { return new (std::nothrow) Solarwinds::Cache(); }
+void *Cache_Allocate(long cache_max_size) {
+  return new (std::nothrow) Solarwinds::Cache();
+}
 
 void Cache_Free(void *cache) {
   if (cache != nullptr) {
@@ -21,17 +23,17 @@ void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
   }
 }
 
-bool Cache_Get(void *cache, char *collector, char *token, char *serviceName,
-               char *ans) {
+zend_string *Cache_Get(void *cache, char *collector, char *token,
+                       char *serviceName) {
   if (cache != nullptr && collector != nullptr && token != nullptr &&
       serviceName != nullptr) {
     auto c = static_cast<Solarwinds::Cache *>(cache);
     auto result = c->Get(std::string(collector), std::string(token),
                          std::string(serviceName));
     if (result.first) {
-      snprintf(ans, SETTINGS_BUFFER_SIZE, "%s", result.second.c_str());
-      return true;
+      return zend_string_init(result.second.c_str(), result.second.size(),
+                              false);
     }
   }
-  return false;
+  return nullptr;
 }

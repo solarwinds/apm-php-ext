@@ -24,6 +24,12 @@
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
 PHP_INI_BEGIN()
+STD_PHP_INI_ENTRY("apm_ext.cache_max_size", "10000", PHP_INI_ALL,
+                  OnUpdateLongGEZero, cache_max_size, zend_apm_ext_globals,
+                  apm_ext_globals)
+STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "2048", PHP_INI_ALL,
+                  OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
+                  apm_ext_globals)
 PHP_INI_END()
 
 /* {{{ void Solarwinds\\Cache\\get() */
@@ -34,6 +40,7 @@ PHP_FUNCTION(Solarwinds_Cache_get) {
   size_t token_len;
   char *service_name;
   size_t service_name_len;
+
   ZEND_PARSE_PARAMETERS_START(3, 3)
   Z_PARAM_STRING(collector, collector_len)
   Z_PARAM_STRING(token, token_len)
@@ -44,11 +51,11 @@ PHP_FUNCTION(Solarwinds_Cache_get) {
     RETURN_FALSE;
   }
 
-  char settings[SETTINGS_BUFFER_SIZE] = {0};
-  if (Cache_Get(APM_EXT_G(cache), collector, token, service_name, settings)) {
-    RETURN_STRING(settings);
+  zend_string *settings =
+      Cache_Get(APM_EXT_G(cache), collector, token, service_name);
+  if (settings != NULL) {
+    RETURN_NEW_STR(settings);
   }
-
   RETURN_FALSE;
 }
 /* }}} */
@@ -71,10 +78,13 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
   ZEND_PARSE_PARAMETERS_END();
 
   if (collector_len && token_len && service_name_len && settings_len) {
-    Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
-    RETURN_TRUE;
+    if (settings_len <= (size_t)APM_EXT_G(settings_max_length)) {
+      Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
+      RETURN_TRUE;
+    }
+    fprintf(stderr, "apm_ext: settings length %zu exceeds max length %ld\n",
+            settings_len, APM_EXT_G(settings_max_length));
   }
-
   RETURN_FALSE;
 }
 /* }}} */
@@ -85,7 +95,9 @@ void prefork() {
   APM_EXT_G(cache) = NULL;
 }
 
-void postfork() { APM_EXT_G(cache) = Cache_Allocate(); }
+void postfork() {
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_size));
+}
 #endif
 
 /* {{{ PHP_MINIT_FUNCTION */
@@ -95,7 +107,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
 #endif
   REGISTER_INI_ENTRIES();
 
-  APM_EXT_G(cache) = Cache_Allocate();
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_size));
 
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);

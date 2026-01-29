@@ -39,8 +39,8 @@ public:
 private:
   /**
    * The in-memory cache storing settings.
-   * The key is a tuple of (collector, std::hash<std::string>{}(token), serviceName).
-   * The value is the cached settings string.
+   * The key is a tuple of (collector, std::hash<std::string>{}(token),
+   * serviceName). The value is the cached settings string.
    */
   std::map<std::tuple<std::string, std::size_t, std::string>, std::string>
       cache_;
