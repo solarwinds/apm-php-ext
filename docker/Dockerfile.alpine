@@ -25,7 +25,7 @@ RUN apk add --no-cache \
 ARG PHP_VERSION
 ENV PHP_URL="https://github.com/php/php-src/archive/refs/tags/php-${PHP_VERSION}.tar.gz"
 
-ARG PHP_CONFIG_OPTS="--enable-debug"
+ARG PHP_CONFIG_OPTS="--enable-debug --enable-pcntl"
 RUN echo "$PHP_URL" && curl -fsSL -o php.tar.gz "$PHP_URL" \
   && cd /usr/src \
   && mkdir php-src \
