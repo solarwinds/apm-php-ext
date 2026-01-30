@@ -40,11 +40,16 @@ public:
                                    const std::string &serviceName);
 
 private:
+  /**
+   * Maximum number of entries the cache can hold.
+   */
   size_t max_entries_;
-
+  /**
+   * The underlying cache storage as a list to maintain LRU order.
+   */
   std::list<std::pair<std::string, std::string>> cache_;
   /**
-   * The underlying cache storage.
+   * Map for quick lookup of cache entries.
    */
   std::unordered_map<std::string,
                      std::list<std::pair<std::string, std::string>>::iterator>
