@@ -15,6 +15,10 @@ namespace Solarwinds {
 
 class Cache {
 public:
+  /**
+   * Constructor to initialize the cache with a maximum number of entries.
+   * @param max_entries The maximum number of entries the cache can hold.
+   */
   Cache(size_t max_entries);
   /**
    * Store settings in the cache.
