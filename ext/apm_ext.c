@@ -21,13 +21,17 @@
   ZEND_PARSE_PARAMETERS_END()
 #endif
 
+#define COLLECTOR_MAX_LENGTH 100
+#define TOKEN_MAX_LENGTH 128
+#define SERVICE_NAME_MAX_LENGTH 128
+
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
 PHP_INI_BEGIN()
-STD_PHP_INI_ENTRY("apm_ext.cache_max_entries", "20", PHP_INI_ALL,
+STD_PHP_INI_ENTRY("apm_ext.cache_max_entries", "48", PHP_INI_ALL,
                   OnUpdateLongGEZero, cache_max_entries, zend_apm_ext_globals,
                   apm_ext_globals)
-STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "4096", PHP_INI_ALL,
+STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "2048", PHP_INI_ALL,
                   OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
                   apm_ext_globals)
 PHP_INI_END()
@@ -78,12 +82,29 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
   ZEND_PARSE_PARAMETERS_END();
 
   if (collector_len && token_len && service_name_len && settings_len) {
-    if (settings_len <= (size_t)APM_EXT_G(settings_max_length)) {
-      Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
-      RETURN_TRUE;
+    if (collector_len > COLLECTOR_MAX_LENGTH) {
+      fprintf(stderr, "apm_ext: collector length %zu exceeds max length %d\n",
+              collector_len, COLLECTOR_MAX_LENGTH);
+      RETURN_FALSE;
     }
-    fprintf(stderr, "apm_ext: settings length %zu exceeds max length %ld\n",
-            settings_len, (long)APM_EXT_G(settings_max_length));
+    if (token_len > TOKEN_MAX_LENGTH) {
+      fprintf(stderr, "apm_ext: token length %zu exceeds max length %d\n",
+              token_len, TOKEN_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (service_name_len > SERVICE_NAME_MAX_LENGTH) {
+      fprintf(stderr,
+              "apm_ext: service name length %zu exceeds max length %d\n",
+              service_name_len, SERVICE_NAME_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (settings_len > (size_t)APM_EXT_G(settings_max_length)) {
+      fprintf(stderr, "apm_ext: settings length %zu exceeds max length %ld\n",
+              settings_len, (long)APM_EXT_G(settings_max_length));
+      RETURN_FALSE;
+    }
+    Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
+    RETURN_TRUE;
   }
   RETURN_FALSE;
 }
