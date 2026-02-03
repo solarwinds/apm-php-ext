@@ -1,5 +1,5 @@
 --TEST--
-\Solarwinds\Cache settings max length test
+\Solarwinds\Cache max entries test
 --EXTENSIONS--
 apm_ext
 --INI--
