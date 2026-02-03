@@ -1,24 +1,26 @@
 --TEST--
-\Solarwinds\Sampler\settings() Basic test
+\Solarwinds\Cache\get test
 --EXTENSIONS--
 apm_ext
 --FILE--
 <?php
-$ret = \Solarwinds\Sampler\settings("apm.collector.na-01.cloud.solarwinds.com", "token:unknown");
-var_dump(strlen($ret) == 0);
 
-// Poll for the setting to become non-empty, up to ~1 second total.
-$maxAttempts = 100;
-$intervalMicros = 10000; // 10ms
-for ($i = 0; $i < $maxAttempts; $i++) {
-    $ret = \Solarwinds\Sampler\settings("apm.collector.na-01.cloud.solarwinds.com", "token:unknown");
-    if (strlen($ret) > 0) {
-        break;
+// Retrieve non-existing value
+for ($i = 0; $i < 2; $i++) {
+    for ($j = 0; $j < 2; $j++) {
+        for ($k = 0; $k < 2; $k++) {
+            var_dump(\Solarwinds\Cache\get("c".$i, "t".$j, "n".$k));
+        }
     }
-    usleep($intervalMicros);
 }
-var_dump(strlen($ret) > 0);
+
 ?>
 --EXPECT--
-bool(true)
-bool(true)
+bool(false)
+bool(false)
+bool(false)
+bool(false)
+bool(false)
+bool(false)
+bool(false)
+bool(false)

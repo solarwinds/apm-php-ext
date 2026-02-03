@@ -7,7 +7,7 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_apm_ext.h"
-#include "settings_service_c_wrapper.h"
+#include "cache_c_wrapper.h"
 #include "apm_ext_arginfo.h"
 #ifndef _WIN32
 #include <pthread.h>
@@ -21,44 +21,103 @@
   ZEND_PARSE_PARAMETERS_END()
 #endif
 
+#define COLLECTOR_MAX_LENGTH 100
+#define TOKEN_MAX_LENGTH 128
+#define SERVICE_NAME_MAX_LENGTH 128
+
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
 PHP_INI_BEGIN()
+STD_PHP_INI_ENTRY("apm_ext.cache_max_entries", "48", PHP_INI_ALL,
+                  OnUpdateLongGEZero, cache_max_entries, zend_apm_ext_globals,
+                  apm_ext_globals)
+STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "2048", PHP_INI_ALL,
+                  OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
+                  apm_ext_globals)
 PHP_INI_END()
 
-/* {{{ void Solarwinds\\Sampler\\settings() */
-PHP_FUNCTION(Solarwinds_Sampler_settings) {
+/* {{{ void Solarwinds\\Cache\\get() */
+PHP_FUNCTION(Solarwinds_Cache_get) {
   char *collector;
-  size_t collctor_len;
-  char *service_key;
-  size_t service_key_len;
-  ZEND_PARSE_PARAMETERS_START(2, 2)
-    Z_PARAM_STRING(collector, collctor_len)
-    Z_PARAM_STRING(service_key, service_key_len)
+  size_t collector_len;
+  char *token;
+  size_t token_len;
+  char *service_name;
+  size_t service_name_len;
+
+  ZEND_PARSE_PARAMETERS_START(3, 3)
+  Z_PARAM_STRING(collector, collector_len)
+  Z_PARAM_STRING(token, token_len)
+  Z_PARAM_STRING(service_name, service_name_len)
   ZEND_PARSE_PARAMETERS_END();
 
-  char settings[SETTINGS_BUFFER_SIZE] = {0};
-
-  if (!collctor_len || !service_key_len) {
-    RETURN_STRING(settings);
+  if (!collector_len || !token_len || !service_name_len) {
+    RETURN_FALSE;
   }
 
-  if (APM_EXT_G(settings_service) == NULL) {
-    APM_EXT_G(settings_service) = Settings_Service_Allocate(collector, service_key);
+  zend_string *settings =
+      Cache_Get(APM_EXT_G(cache), collector, token, service_name);
+  if (settings != NULL) {
+    RETURN_NEW_STR(settings);
   }
+  RETURN_FALSE;
+}
+/* }}} */
 
-  Settings_Service_Get_Settings(APM_EXT_G(settings_service), settings);
-  RETURN_STRING(settings);
+/* {{{ void Solarwinds\\Cache\\put() */
+PHP_FUNCTION(Solarwinds_Cache_put) {
+  char *collector;
+  size_t collector_len;
+  char *token;
+  size_t token_len;
+  char *service_name;
+  size_t service_name_len;
+  char *settings;
+  size_t settings_len;
+  ZEND_PARSE_PARAMETERS_START(4, 4)
+  Z_PARAM_STRING(collector, collector_len)
+  Z_PARAM_STRING(token, token_len)
+  Z_PARAM_STRING(service_name, service_name_len)
+  Z_PARAM_STRING(settings, settings_len)
+  ZEND_PARSE_PARAMETERS_END();
+
+  if (collector_len && token_len && service_name_len && settings_len) {
+    if (collector_len > COLLECTOR_MAX_LENGTH) {
+      fprintf(stderr, "apm_ext: collector length %zu exceeds max length %d\n",
+              collector_len, COLLECTOR_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (token_len > TOKEN_MAX_LENGTH) {
+      fprintf(stderr, "apm_ext: token length %zu exceeds max length %d\n",
+              token_len, TOKEN_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (service_name_len > SERVICE_NAME_MAX_LENGTH) {
+      fprintf(stderr,
+              "apm_ext: service name length %zu exceeds max length %d\n",
+              service_name_len, SERVICE_NAME_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (settings_len > (size_t)APM_EXT_G(settings_max_length)) {
+      fprintf(stderr, "apm_ext: settings length %zu exceeds max length %ld\n",
+              settings_len, (long)APM_EXT_G(settings_max_length));
+      RETURN_FALSE;
+    }
+    Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
+    RETURN_TRUE;
+  }
+  RETURN_FALSE;
 }
 /* }}} */
 
 #ifndef _WIN32
 void prefork() {
-  Settings_Service_Free(APM_EXT_G(settings_service));
-  APM_EXT_G(settings_service) = NULL;
+  Cache_Free(APM_EXT_G(cache));
+  APM_EXT_G(cache) = NULL;
 }
 
 void postfork() {
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
 }
 #endif
 
@@ -68,6 +127,8 @@ PHP_MINIT_FUNCTION(apm_ext) {
   ZEND_TSRMLS_CACHE_UPDATE();
 #endif
   REGISTER_INI_ENTRIES();
+
+  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
 
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);
@@ -79,8 +140,8 @@ PHP_MINIT_FUNCTION(apm_ext) {
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION */
 PHP_MSHUTDOWN_FUNCTION(apm_ext) {
-  Settings_Service_Free(APM_EXT_G(settings_service));
-  APM_EXT_G(settings_service) = NULL;
+  Cache_Free(APM_EXT_G(cache));
+  APM_EXT_G(cache) = NULL;
 
   UNREGISTER_INI_ENTRIES();
 
@@ -108,8 +169,7 @@ PHP_MINFO_FUNCTION(apm_ext) {
 /* }}} */
 
 /* {{{ PHP_GINIT_FUNCTION */
-PHP_GINIT_FUNCTION(apm_ext)
-{
+PHP_GINIT_FUNCTION(apm_ext) {
   ZEND_SECURE_ZERO(apm_ext_globals, sizeof(*apm_ext_globals));
 }
 /* }}} */

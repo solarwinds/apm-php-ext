@@ -2,7 +2,7 @@ ARG ALPINE_VERSION=alpine:3.20@sha256:765942a4039992336de8dd5db680586e1a206607dd
 FROM ${ALPINE_VERSION} AS builder
 WORKDIR /usr/src
 
-ENV PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c curl-dev openssl"
+ENV PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c"
 
 RUN apk add --no-cache \
     ${PHPIZE_DEPS} \
@@ -25,7 +25,7 @@ RUN apk add --no-cache \
 ARG PHP_VERSION
 ENV PHP_URL="https://github.com/php/php-src/archive/refs/tags/php-${PHP_VERSION}.tar.gz"
 
-ARG PHP_CONFIG_OPTS="--enable-debug"
+ARG PHP_CONFIG_OPTS="--enable-debug --enable-pcntl"
 RUN echo "$PHP_URL" && curl -fsSL -o php.tar.gz "$PHP_URL" \
   && cd /usr/src \
   && mkdir php-src \

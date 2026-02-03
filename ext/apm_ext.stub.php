@@ -2,6 +2,8 @@
 
 /** @generate-function-entries */
 
-namespace Solarwinds\Sampler;
+namespace Solarwinds\Cache;
 
-function settings(string $collector, string $serviceKey): string {}
+function get(string $collector, string $token, string $serviceName): string|false {}
+
+function put(string $collector, string $token, string $serviceName, string $settings): bool {}
