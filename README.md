@@ -27,8 +27,8 @@ This extension can be configured via `.ini` by modifying the following entries:
 
 | Configuration                 | Default | Description                                       |
 |-------------------------------|---------|---------------------------------------------------|
-| `apm_ext.cache_max_entries`   | 48      | Maximum number of entries in the cache            |
-| `apm_ext.settings_max_length` | 2048    | Maximum length of the settings value in the cache |
+| apm_ext.cache_max_entries     | 48      | Maximum number of entries in the cache            |
+| apm_ext.settings_max_length   | 2048    | Maximum length of the settings value in the cache |
 
 ## Verify that the extension is installed and enabled
 
