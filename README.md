@@ -1,7 +1,11 @@
 # apm-php-ext
+![Packagist Version](https://img.shields.io/packagist/v/solarwinds/apm_ext)
+![Packagist Downloads](https://img.shields.io/packagist/dm/solarwinds/apm_ext)
+[![Build](https://github.com/solarwinds/apm-php-ext/actions/workflows/build.yml/badge.svg)](https://github.com/solarwinds/apm-php-ext/actions/workflows/build.yml)
+![GitHub License](https://img.shields.io/github/license/solarwinds/apm-php-ext)
 
 ## Overview
-solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), to cache the sampling setting for the APM library.
+solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), used to cache the sampling settings for the APM library.
 
 ## Requirements
 - PHP 8+
@@ -9,7 +13,7 @@ solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packag
 
 ## Installation
 
-The extension can be installed in the following way:
+You can install the extension as follows:
 
 ### php-extension-installer
 
@@ -17,7 +21,16 @@ The extension can be installed in the following way:
 pie install solarwinds/apm_ext
 ```
 
-## Verify that the extension is installed and enabled
+## Configuration
+
+This extension can be configured via `.ini` by modifying the following entries:
+
+| Configuration                 | Default | Description                                       |
+|-------------------------------|---------|---------------------------------------------------|
+| `apm_ext.cache_max_entries`   | 48      | Maximum number of entries in the cache            |
+| `apm_ext.settings_max_length` | 2048    | Maximum length of the settings value in the cache |
+
+## To verify that the extension is installed and enabled:
 
 ```shell
 php --ri  apm_ext
@@ -25,7 +38,7 @@ php --ri  apm_ext
 
 ## Contributing
 
-Contributions are welcome!
+We welcome contributions!
 
 Thanks to all contributors:
 <a href="https://github.com/solarwinds/apm-php-ext/graphs/contributors">
