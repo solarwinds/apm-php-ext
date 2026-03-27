@@ -5,7 +5,7 @@
 ![GitHub License](https://img.shields.io/github/license/solarwinds/apm-php-ext)
 
 ## Overview
-solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), used to cache the sampling settings for the APM library.
+solarwinds/apm_ext is an add-on PHP extension to [solarwinds/apm](https://packagist.org/packages/solarwinds/apm), used to cache the sampling settings and the token bucket state for the APM library.
 
 ## Requirements
 - PHP 8+
@@ -25,10 +25,12 @@ pie install solarwinds/apm_ext
 
 This extension can be configured via `.ini` by modifying the following entries:
 
-| Configuration                 | Default | Description                                       |
-|-------------------------------|---------|---------------------------------------------------|
-| apm_ext.cache_max_entries     | 48      | Maximum number of entries in the cache            |
-| apm_ext.settings_max_length   | 2048    | Maximum length of the settings value in the cache |
+| Configuration                          | Default | Description                                                        |
+|----------------------------------------|---------|--------------------------------------------------------------------|
+| apm_ext.cache_max_entries              | 48      | Maximum number of entries in the cache                             |
+| apm_ext.settings_max_length            | 2048    | Maximum length of the settings value in the cache                  |
+| apm_ext.bucket_state_cache_max_entries | 512     | Maximum number of entries in the bucket state cache                |
+| apm_ext.bucket_state_max_length        | 2048    | Maximum length of the bucket state value in the bucket state cache |
 
 ## Verify that the extension is installed and enabled
 
