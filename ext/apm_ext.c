@@ -24,6 +24,7 @@
 #define COLLECTOR_MAX_LENGTH 100
 #define TOKEN_MAX_LENGTH 128
 #define SERVICE_NAME_MAX_LENGTH 128
+#define PID_MAX_LENGTH 8
 
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
@@ -33,6 +34,12 @@ STD_PHP_INI_ENTRY("apm_ext.cache_max_entries", "48", PHP_INI_ALL,
                   apm_ext_globals)
 STD_PHP_INI_ENTRY("apm_ext.settings_max_length", "2048", PHP_INI_ALL,
                   OnUpdateLongGEZero, settings_max_length, zend_apm_ext_globals,
+                  apm_ext_globals)
+STD_PHP_INI_ENTRY("apm_ext.bucket_state_cache_max_entries", "512", PHP_INI_ALL,
+                  OnUpdateLongGEZero, bucket_state_cache_max_entries, zend_apm_ext_globals,
+                  apm_ext_globals)
+STD_PHP_INI_ENTRY("apm_ext.bucket_state_max_length", "2048", PHP_INI_ALL,
+                  OnUpdateLongGEZero, bucket_state_max_length, zend_apm_ext_globals,
                   apm_ext_globals)
 PHP_INI_END()
 
@@ -110,14 +117,67 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
 }
 /* }}} */
 
+/* {{{ void Solarwinds\\Cache\\getBucketState() */
+PHP_FUNCTION(Solarwinds_Cache_getBucketState) {
+  char *pid;
+  size_t pid_len;
+
+  ZEND_PARSE_PARAMETERS_START(1, 1)
+  Z_PARAM_STRING(pid, pid_len)
+  ZEND_PARSE_PARAMETERS_END();
+
+  if (!pid_len) {
+    RETURN_FALSE;
+  }
+
+  zend_string *state = Cache_GetBucketState(APM_EXT_G(bucket_state_cache), pid);
+  if (state != NULL) {
+    RETURN_NEW_STR(state);
+  }
+  RETURN_FALSE;
+}
+/* }}} */
+
+/* {{{ void Solarwinds\\Cache\\putBucketState() */
+PHP_FUNCTION(Solarwinds_Cache_putBucketState) {
+  char *pid;
+  size_t pid_len;
+  char *bucket_state;
+  size_t bucket_state_len;
+
+  ZEND_PARSE_PARAMETERS_START(2, 2)
+  Z_PARAM_STRING(pid, pid_len)
+  Z_PARAM_STRING(bucket_state, bucket_state_len)
+  ZEND_PARSE_PARAMETERS_END();
+
+  if (pid_len && bucket_state_len) {
+    if (pid_len > PID_MAX_LENGTH) {
+      fprintf(stderr, "apm_ext: pid length %zu exceeds max length %d\n", pid_len, PID_MAX_LENGTH);
+      RETURN_FALSE;
+    }
+    if (bucket_state_len > (size_t)APM_EXT_G(bucket_state_max_length)) {
+      fprintf(stderr, "apm_ext: bucket state length %zu exceeds max length %ld\n",
+              bucket_state_len, (long)APM_EXT_G(bucket_state_max_length));
+      RETURN_FALSE;
+    }
+    Cache_PutBucketState(APM_EXT_G(bucket_state_cache), pid, bucket_state);
+    RETURN_TRUE;
+  }
+  RETURN_FALSE;
+}
+/* }}} */
+
 #ifndef _WIN32
 void prefork() {
+  Cache_Free(APM_EXT_G(bucket_state_cache));
+  APM_EXT_G(bucket_state_cache) = NULL;
   Cache_Free(APM_EXT_G(cache));
   APM_EXT_G(cache) = NULL;
 }
 
 void postfork() {
   APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
+  APM_EXT_G(bucket_state_cache) = Cache_Allocate(APM_EXT_G(bucket_state_cache_max_entries));
 }
 #endif
 
@@ -129,7 +189,7 @@ PHP_MINIT_FUNCTION(apm_ext) {
   REGISTER_INI_ENTRIES();
 
   APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
-
+  APM_EXT_G(bucket_state_cache) = Cache_Allocate(APM_EXT_G(bucket_state_cache_max_entries));
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);
 #endif
@@ -140,6 +200,8 @@ PHP_MINIT_FUNCTION(apm_ext) {
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION */
 PHP_MSHUTDOWN_FUNCTION(apm_ext) {
+  Cache_Free(APM_EXT_G(bucket_state_cache));
+  APM_EXT_G(bucket_state_cache) = NULL;
   Cache_Free(APM_EXT_G(cache));
   APM_EXT_G(cache) = NULL;
 
