@@ -6,7 +6,7 @@ apm_ext
 <?php
 
 $vpid = '';
-for ($i = 0; $i < 8; $i++) {
+for ($i = 0; $i < 10; $i++) {
     $vpid .= 'a';
 }
 
@@ -14,7 +14,7 @@ var_dump(\Solarwinds\Cache\putBucketState($vpid, "1"));
 var_dump(\Solarwinds\Cache\getBucketState($vpid));
 
 $ivpid = '';
-for ($i = 0; $i < 9; $i++) {
+for ($i = 0; $i < 11; $i++) {
     $ivpid .= 'a';
 }
 
@@ -25,7 +25,7 @@ var_dump(\Solarwinds\Cache\getBucketState($ivpid));
 --EXPECT--
 bool(true)
 string(1) "1"
-apm_ext: pid length 9 exceeds max length 8
+apm_ext: pid length 11 exceeds max length 10
 bool(false)
 bool(false)
 

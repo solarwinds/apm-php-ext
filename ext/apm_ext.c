@@ -24,7 +24,8 @@
 #define COLLECTOR_MAX_LENGTH 100
 #define TOKEN_MAX_LENGTH 128
 #define SERVICE_NAME_MAX_LENGTH 128
-#define PID_MAX_LENGTH 8
+// Windows process ID range can be [0, 4294967295]
+#define PID_MAX_LENGTH 10
 
 ZEND_DECLARE_MODULE_GLOBALS(apm_ext)
 
