@@ -10,10 +10,10 @@ extern "C" {
 /**
  * Allocate and initialize a new cache instance.
  *
- * @param cache_max_entries The maximum number of entries the cache can hold.
+ * @param max_entries The maximum number of entries the cache can hold.
  * @return A pointer to the allocated cache instance.
  */
-void *Cache_Allocate(long cache_max_entries);
+void *Cache_Allocate(long max_entries);
 
 /**
  * Free the allocated cache instance.
@@ -44,6 +44,23 @@ void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
  */
 zend_string *Cache_Get(void *cache, char *collector, char *token,
                        char *serviceName);
+
+/**
+ * Store bucket token state in the cache.
+ *
+ * @param cache A pointer to the cache instance.
+ * @param pid The process id.
+ * @param bucketTokenState The bucket token state.
+ */
+void Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState);
+
+/**
+ * Retrieve bucket token state from the cache.
+ * @param cache A pointer to the cache instance.
+ * @param pid The process id.
+ * @return The bucket token state if found, otherwise NULL.
+ */
+zend_string *Cache_GetBucketState(void *cache, char *pid);
 
 #ifdef __cplusplus
 }

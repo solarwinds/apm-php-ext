@@ -10,13 +10,16 @@ ZEND_BEGIN_MODULE_GLOBALS(apm_ext)
 void *cache;
 zend_long cache_max_entries;
 zend_long settings_max_length;
+void *bucket_state_cache;
+zend_long bucket_state_cache_max_entries;
+zend_long bucket_state_max_length;
 ZEND_END_MODULE_GLOBALS(apm_ext)
 
 ZEND_EXTERN_MODULE_GLOBALS(apm_ext)
 
 #define APM_EXT_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(apm_ext, v)
 
-#define PHP_APM_EXT_VERSION "1.0.0"
+#define PHP_APM_EXT_VERSION "2.0.0"
 
 #if defined(ZTS) && defined(COMPILE_DL_APM_EXT)
 ZEND_TSRMLS_CACHE_EXTERN()
