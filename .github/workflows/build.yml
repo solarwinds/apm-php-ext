@@ -139,10 +139,6 @@ jobs:
           pattern: php_apm_ext-*
           merge-multiple: true
           path: ext/artifacts
-      - name: zip
-        run: |
-          cd artifacts
-          find . -maxdepth 1 -type d -exec zip -jr {}.zip {} \;
       - name: Release
         # `gh release` cannot replicate this action's create-or-update behaviour
         # on re-run, and rewriting release automation is out of scope here.
