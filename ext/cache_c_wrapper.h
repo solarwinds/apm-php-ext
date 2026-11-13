@@ -30,9 +30,11 @@ void Cache_Free(void *cache);
  * @param token The token.
  * @param serviceName The name of the service.
  * @param settings The settings to be cached.
+ * @return 1 if the settings were stored, 0 on invalid arguments or allocation
+ * failure (any previously cached value for the key is left unchanged).
  */
-void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
-               char *settings);
+int Cache_Put(void *cache, char *collector, char *token, char *serviceName,
+              char *settings);
 
 /**
  * Retrieve settings from the cache.
@@ -51,8 +53,10 @@ zend_string *Cache_Get(void *cache, char *collector, char *token,
  * @param cache A pointer to the cache instance.
  * @param pid The process id.
  * @param bucketTokenState The bucket token state.
+ * @return 1 if the state was stored, 0 on invalid arguments or allocation
+ * failure (any previously cached value for the key is left unchanged).
  */
-void Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState);
+int Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState);
 
 /**
  * Retrieve bucket token state from the cache.

@@ -111,8 +111,8 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
               settings_len, (long)APM_EXT_G(settings_max_length));
       RETURN_FALSE;
     }
-    Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
-    RETURN_TRUE;
+    RETURN_BOOL(
+        Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings));
   }
   RETURN_FALSE;
 }
@@ -161,8 +161,8 @@ PHP_FUNCTION(Solarwinds_Cache_putBucketState) {
               bucket_state_len, (long)APM_EXT_G(bucket_state_max_length));
       RETURN_FALSE;
     }
-    Cache_PutBucketState(APM_EXT_G(bucket_state_cache), pid, bucket_state);
-    RETURN_TRUE;
+    RETURN_BOOL(Cache_PutBucketState(APM_EXT_G(bucket_state_cache), pid,
+                                     bucket_state));
   }
   RETURN_FALSE;
 }

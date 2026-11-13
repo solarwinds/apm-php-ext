@@ -70,18 +70,20 @@ void *Cache_Allocate(long max_entries) {
 
 void Cache_Free(void *cache) { sw_cache_destroy((sw_cache *)cache); }
 
-void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
-               char *settings) {
+int Cache_Put(void *cache, char *collector, char *token, char *serviceName,
+              char *settings) {
+  int ok = 0;
   if (cache != NULL && collector != NULL && token != NULL &&
       serviceName != NULL && settings != NULL) {
     size_t key_len;
     char *key = build_settings_key(collector, token, serviceName, &key_len);
     if (key != NULL) {
-      sw_cache_put((sw_cache *)cache, key, key_len, settings,
-                   strlen(settings));
+      ok = sw_cache_put((sw_cache *)cache, key, key_len, settings,
+                        strlen(settings));
       free(key);
     }
   }
+  return ok;
 }
 
 zend_string *Cache_Get(void *cache, char *collector, char *token,
@@ -100,11 +102,12 @@ zend_string *Cache_Get(void *cache, char *collector, char *token,
   return snapshot_to_zend_string(snapshot, len);
 }
 
-void Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState) {
+int Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState) {
   if (cache != NULL && pid != NULL && bucketTokenState != NULL) {
-    sw_cache_put((sw_cache *)cache, pid, strlen(pid), bucketTokenState,
-                 strlen(bucketTokenState));
+    return sw_cache_put((sw_cache *)cache, pid, strlen(pid), bucketTokenState,
+                        strlen(bucketTokenState));
   }
+  return 0;
 }
 
 zend_string *Cache_GetBucketState(void *cache, char *pid) {
