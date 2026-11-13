@@ -43,12 +43,22 @@ int sw_cache_put(sw_cache *cache, const char *key, size_t key_len,
                  const char *value, size_t value_len);
 
 /**
- * Look up an entry and invoke `copy` with its value while the cache lock is
- * held, so the caller can copy it into its own storage.
+ * Look up an entry, marking it most recently used.
  *
- * @return The result of `copy` if found, otherwise NULL.
+ * The value is copied into a malloc'd snapshot while the lock is held, so no
+ * code that may longjmp (e.g. Zend allocation hitting memory_limit) ever runs
+ * under the lock. The snapshot is NUL-terminated for convenience.
+ *
+ * @param value_len Receives the value length when found.
+ * @return The snapshot (free with sw_cache_value_free), or NULL if not found
+ * or on allocation failure.
  */
-void *sw_cache_get(sw_cache *cache, const char *key, size_t key_len,
-                   void *(*copy)(const char *value, size_t value_len));
+char *sw_cache_get(sw_cache *cache, const char *key, size_t key_len,
+                   size_t *value_len);
+
+/**
+ * Free a snapshot returned by sw_cache_get. NULL is a no-op.
+ */
+void sw_cache_value_free(char *value);
 
 #endif // APM_PHP_EXT_CACHE_H

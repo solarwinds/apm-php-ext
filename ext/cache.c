@@ -265,23 +265,29 @@ int sw_cache_put(sw_cache *c, const char *key, size_t key_len,
   return 1;
 }
 
-void *sw_cache_get(sw_cache *c, const char *key, size_t key_len,
-                   void *(*copy)(const char *value, size_t value_len)) {
-  void *result = NULL;
+char *sw_cache_get(sw_cache *c, const char *key, size_t key_len,
+                   size_t *value_len) {
+  char *result = NULL;
   sw_cache_entry *e;
   size_t hash;
 
-  if (c == NULL || key == NULL || copy == NULL) {
+  if (c == NULL || key == NULL || value_len == NULL) {
     return NULL;
   }
   hash = sw_cache_hash(key, key_len);
 
+  /* Only system allocator calls under the lock: nothing here can longjmp. */
   SW_MUTEX_LOCK(&c->mutex);
   e = sw_find(c, key, key_len, hash);
   if (e != NULL) {
     sw_list_move_to_tail(c, e);
-    result = copy(e->value, e->value_len);
+    result = sw_memdup(e->value, e->value_len);
+    if (result != NULL) {
+      *value_len = e->value_len;
+    }
   }
   SW_MUTEX_UNLOCK(&c->mutex);
   return result;
 }
+
+void sw_cache_value_free(char *value) { free(value); }

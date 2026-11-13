@@ -1,3 +1,8 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "php.h" /* zend_try/zend_catch need the full PHP/Zend config */
 #include "cache_c_wrapper.h"
 #include "cache.h"
 
@@ -9,8 +14,26 @@
 /* Max decimal digits of a 64-bit unsigned integer. */
 #define HASH_MAX_DIGITS 20
 
-static void *copy_to_zend_string(const char *value, size_t value_len) {
-  return zend_string_init(value, value_len, 0);
+/*
+ * Convert a cache snapshot to a zend_string and free the snapshot. Called
+ * after the cache lock is released; the snapshot is freed even if
+ * zend_string_init() bails out (e.g. memory_limit exceeded).
+ */
+static zend_string *snapshot_to_zend_string(char *snapshot, size_t len) {
+  char *volatile snap = snapshot;
+  zend_string *volatile result = NULL;
+
+  if (snap == NULL) {
+    return NULL;
+  }
+  zend_try { result = zend_string_init(snap, len, 0); }
+  zend_catch {
+    sw_cache_value_free(snap);
+    zend_bailout();
+  }
+  zend_end_try();
+  sw_cache_value_free(snap);
+  return result;
 }
 
 /*
@@ -63,18 +86,18 @@ void Cache_Put(void *cache, char *collector, char *token, char *serviceName,
 
 zend_string *Cache_Get(void *cache, char *collector, char *token,
                        char *serviceName) {
-  zend_string *result = NULL;
+  char *snapshot = NULL;
+  size_t len = 0;
   if (cache != NULL && collector != NULL && token != NULL &&
       serviceName != NULL) {
     size_t key_len;
     char *key = build_settings_key(collector, token, serviceName, &key_len);
     if (key != NULL) {
-      result = (zend_string *)sw_cache_get((sw_cache *)cache, key, key_len,
-                                           copy_to_zend_string);
-      free(key);
+      snapshot = sw_cache_get((sw_cache *)cache, key, key_len, &len);
+      free(key); /* before any Zend allocation that could bail out */
     }
   }
-  return result;
+  return snapshot_to_zend_string(snapshot, len);
 }
 
 void Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState) {
@@ -86,8 +109,9 @@ void Cache_PutBucketState(void *cache, char *pid, char *bucketTokenState) {
 
 zend_string *Cache_GetBucketState(void *cache, char *pid) {
   if (cache != NULL && pid != NULL) {
-    return (zend_string *)sw_cache_get((sw_cache *)cache, pid, strlen(pid),
-                                       copy_to_zend_string);
+    size_t len = 0;
+    char *snapshot = sw_cache_get((sw_cache *)cache, pid, strlen(pid), &len);
+    return snapshot_to_zend_string(snapshot, len);
   }
   return NULL;
 }
