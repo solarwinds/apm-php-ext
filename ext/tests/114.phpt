@@ -5,6 +5,15 @@ apm_ext
 --SKIPIF--
 <?php
 if (getenv('USE_ZEND_ALLOC') === '0') die('skip memory_limit is not enforced without Zend MM');
+// Some PHP builds (e.g. Ubuntu/ondrej PHP 8.1.34) exit immediately on memory
+// exhaustion without running shutdown functions, which this test relies on.
+$php = getenv('TEST_PHP_EXECUTABLE') ?: PHP_BINARY;
+// No double quotes: escapeshellarg() strips them on Windows.
+$probe = "register_shutdown_function(function () { echo 'shutdown ran'; });"
+    . "\$a = str_repeat('y', 6 << 20); \$b = str_repeat('x', 6 << 20);";
+$out = shell_exec(escapeshellarg($php) . ' -n -d memory_limit=12M -d display_errors=0 -r '
+    . escapeshellarg($probe) . ' 2>&1');
+if (strpos((string)$out, 'shutdown ran') === false) die('skip shutdown functions do not run after memory exhaustion on this PHP build');
 ?>
 --INI--
 memory_limit=12M
