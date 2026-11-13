@@ -7,11 +7,14 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_apm_ext.h"
-#include "cache_c_wrapper.h"
+#include "cache.h"
 #include "apm_ext_arginfo.h"
 #ifndef _WIN32
 #include <pthread.h>
 #endif
+#include <inttypes.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 /* For compatibility with older PHP versions */
@@ -44,6 +47,68 @@ STD_PHP_INI_ENTRY("apm_ext.bucket_state_max_length", "2048", PHP_INI_ALL,
                   apm_ext_globals)
 PHP_INI_END()
 
+/* Max decimal digits of a 64-bit unsigned integer. */
+#define HASH_MAX_DIGITS 20
+
+/*
+ * Lengths below come from strlen(), so a PHP string containing a NUL byte is
+ * treated as ending at that byte (the behaviour of the original C++ bridge).
+ */
+
+/*
+ * Build the settings key `collector + hash(token) + serviceName` so the raw
+ * token is never stored. Returns a malloc'd buffer (caller frees) or NULL.
+ */
+static char *build_settings_key(const char *collector, const char *token,
+                                const char *service_name, size_t *key_len) {
+  char hash_buf[HASH_MAX_DIGITS + 1];
+  size_t collector_len = strlen(collector);
+  size_t service_len = strlen(service_name);
+  int hash_len = snprintf(hash_buf, sizeof(hash_buf), "%" PRIu64,
+                          (uint64_t)sw_cache_hash(token, strlen(token)));
+  char *key;
+
+  if (hash_len < 0) {
+    return NULL;
+  }
+  *key_len = collector_len + (size_t)hash_len + service_len;
+  key = (char *)malloc(*key_len + 1);
+  if (key == NULL) {
+    return NULL;
+  }
+  memcpy(key, collector, collector_len);
+  memcpy(key + collector_len, hash_buf, (size_t)hash_len);
+  memcpy(key + collector_len + hash_len, service_name, service_len);
+  key[*key_len] = '\0';
+  return key;
+}
+
+/*
+ * Convert a cache snapshot to a zend_string and free the snapshot. Must be
+ * called after the cache lock is released; the snapshot is freed even if
+ * zend_string_init() bails out (e.g. memory_limit exceeded).
+ */
+static zend_string *snapshot_to_zend_string(char *snapshot, size_t len) {
+  char *volatile snap = snapshot;
+  zend_string *volatile result = NULL;
+
+  if (snap == NULL) {
+    return NULL;
+  }
+  zend_try { result = zend_string_init(snap, len, 0); }
+  zend_catch {
+    sw_cache_value_free(snap);
+    zend_bailout();
+  }
+  zend_end_try();
+  sw_cache_value_free(snap);
+  return result;
+}
+
+static sw_cache *cache_allocate(zend_long max_entries) {
+  return sw_cache_create(max_entries > 0 ? (size_t)max_entries : 0);
+}
+
 /* {{{ void Solarwinds\\Cache\\get() */
 PHP_FUNCTION(Solarwinds_Cache_get) {
   char *collector;
@@ -63,8 +128,17 @@ PHP_FUNCTION(Solarwinds_Cache_get) {
     RETURN_FALSE;
   }
 
-  zend_string *settings =
-      Cache_Get(APM_EXT_G(cache), collector, token, service_name);
+  size_t key_len;
+  char *key = build_settings_key(collector, token, service_name, &key_len);
+  if (key == NULL) {
+    RETURN_FALSE;
+  }
+  size_t settings_len = 0;
+  char *snapshot =
+      sw_cache_get(APM_EXT_G(cache), key, key_len, &settings_len);
+  free(key); /* before any Zend allocation that could bail out */
+
+  zend_string *settings = snapshot_to_zend_string(snapshot, settings_len);
   if (settings != NULL) {
     RETURN_NEW_STR(settings);
   }
@@ -111,8 +185,15 @@ PHP_FUNCTION(Solarwinds_Cache_put) {
               settings_len, (long)APM_EXT_G(settings_max_length));
       RETURN_FALSE;
     }
-    Cache_Put(APM_EXT_G(cache), collector, token, service_name, settings);
-    RETURN_TRUE;
+    size_t key_len;
+    char *key = build_settings_key(collector, token, service_name, &key_len);
+    if (key == NULL) {
+      RETURN_FALSE;
+    }
+    int ok = sw_cache_put(APM_EXT_G(cache), key, key_len, settings,
+                          strlen(settings));
+    free(key);
+    RETURN_BOOL(ok);
   }
   RETURN_FALSE;
 }
@@ -131,7 +212,10 @@ PHP_FUNCTION(Solarwinds_Cache_getBucketState) {
     RETURN_FALSE;
   }
 
-  zend_string *state = Cache_GetBucketState(APM_EXT_G(bucket_state_cache), pid);
+  size_t state_len = 0;
+  char *snapshot = sw_cache_get(APM_EXT_G(bucket_state_cache), pid,
+                                strlen(pid), &state_len);
+  zend_string *state = snapshot_to_zend_string(snapshot, state_len);
   if (state != NULL) {
     RETURN_NEW_STR(state);
   }
@@ -161,8 +245,8 @@ PHP_FUNCTION(Solarwinds_Cache_putBucketState) {
               bucket_state_len, (long)APM_EXT_G(bucket_state_max_length));
       RETURN_FALSE;
     }
-    Cache_PutBucketState(APM_EXT_G(bucket_state_cache), pid, bucket_state);
-    RETURN_TRUE;
+    RETURN_BOOL(sw_cache_put(APM_EXT_G(bucket_state_cache), pid, strlen(pid),
+                             bucket_state, strlen(bucket_state)));
   }
   RETURN_FALSE;
 }
@@ -170,15 +254,15 @@ PHP_FUNCTION(Solarwinds_Cache_putBucketState) {
 
 #ifndef _WIN32
 void prefork() {
-  Cache_Free(APM_EXT_G(bucket_state_cache));
+  sw_cache_destroy(APM_EXT_G(bucket_state_cache));
   APM_EXT_G(bucket_state_cache) = NULL;
-  Cache_Free(APM_EXT_G(cache));
+  sw_cache_destroy(APM_EXT_G(cache));
   APM_EXT_G(cache) = NULL;
 }
 
 void postfork() {
-  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
-  APM_EXT_G(bucket_state_cache) = Cache_Allocate(APM_EXT_G(bucket_state_cache_max_entries));
+  APM_EXT_G(cache) = cache_allocate(APM_EXT_G(cache_max_entries));
+  APM_EXT_G(bucket_state_cache) = cache_allocate(APM_EXT_G(bucket_state_cache_max_entries));
 }
 #endif
 
@@ -189,8 +273,8 @@ PHP_MINIT_FUNCTION(apm_ext) {
 #endif
   REGISTER_INI_ENTRIES();
 
-  APM_EXT_G(cache) = Cache_Allocate(APM_EXT_G(cache_max_entries));
-  APM_EXT_G(bucket_state_cache) = Cache_Allocate(APM_EXT_G(bucket_state_cache_max_entries));
+  APM_EXT_G(cache) = cache_allocate(APM_EXT_G(cache_max_entries));
+  APM_EXT_G(bucket_state_cache) = cache_allocate(APM_EXT_G(bucket_state_cache_max_entries));
 #ifndef _WIN32
   pthread_atfork(prefork, postfork, postfork);
 #endif
@@ -201,9 +285,9 @@ PHP_MINIT_FUNCTION(apm_ext) {
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION */
 PHP_MSHUTDOWN_FUNCTION(apm_ext) {
-  Cache_Free(APM_EXT_G(bucket_state_cache));
+  sw_cache_destroy(APM_EXT_G(bucket_state_cache));
   APM_EXT_G(bucket_state_cache) = NULL;
-  Cache_Free(APM_EXT_G(cache));
+  sw_cache_destroy(APM_EXT_G(cache));
   APM_EXT_G(cache) = NULL;
 
   UNREGISTER_INI_ENTRIES();

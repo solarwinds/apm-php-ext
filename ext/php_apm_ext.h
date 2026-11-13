@@ -3,14 +3,16 @@
 #ifndef PHP_APM_EXT_H
 #define PHP_APM_EXT_H
 
+#include "cache.h"
+
 extern zend_module_entry apm_ext_module_entry;
 #define phpext_apm_ext_ptr &apm_ext_module_entry
 
 ZEND_BEGIN_MODULE_GLOBALS(apm_ext)
-void *cache;
+sw_cache *cache;
 zend_long cache_max_entries;
 zend_long settings_max_length;
-void *bucket_state_cache;
+sw_cache *bucket_state_cache;
 zend_long bucket_state_cache_max_entries;
 zend_long bucket_state_max_length;
 ZEND_END_MODULE_GLOBALS(apm_ext)
