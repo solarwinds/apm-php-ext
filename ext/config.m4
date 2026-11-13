@@ -8,5 +8,5 @@ PHP_ARG_ENABLE([apm_ext],
 
 if test "$PHP_APM_EXT" != "no"; then
   AC_DEFINE(HAVE_APM_EXT, 1, [ Have apm_ext support ])
-  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c cache_c_wrapper.c cache.c], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter")
+  PHP_NEW_EXTENSION(apm_ext, [apm_ext.c cache.c], $ext_shared,, "-Wall -Wextra -Werror -Wno-unused-parameter")
 fi
