@@ -121,7 +121,7 @@ jobs:
 
   release-if-tag:
     runs-on: ubuntu-latest
-    # if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [linux, macos, windows]
     permissions:
       contents: write # required for creating releases
@@ -139,10 +139,10 @@ jobs:
           pattern: php_apm_ext-*
           merge-multiple: true
           path: ext/artifacts
-#      - name: zip
-#        run: |
-#          cd artifacts
-#          find . -maxdepth 1 -type d -exec zip -jr {}.zip {} \;
+      - name: zip
+        run: |
+          cd artifacts
+          find . -maxdepth 1 -type d -exec zip -jr {}.zip {} \;
       - name: Release
         # `gh release` cannot replicate this action's create-or-update behaviour
         # on re-run, and rewriting release automation is out of scope here.
