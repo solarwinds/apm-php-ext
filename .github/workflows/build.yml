@@ -116,7 +116,7 @@ jobs:
           php-version: ${{ matrix.php }}
           arch: x64
           ts: ${{ matrix.ts }}
-          args: --enable-opentelemetry
+          args: --enable-apm_ext
           extension-ref: ${{ steps.ref.outputs.name }}
 
   release-if-tag:
